@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -66,6 +67,40 @@ public class WordControllerTest {
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.word").value("Posting Word"));
+
+    }
+
+    @Test
+    @SneakyThrows
+    public void givenValidPUTRequest_thenUpdateTheWord(){
+
+        Word wordInDb = Word.builder().id(1L).word("Old Word").build();
+        Word newWord = Word.builder().id(1L).word("Updated Word").build();
+
+        given(wordRepository.findById(1L))
+                .willReturn(Optional.ofNullable(wordInDb));
+
+        mvc.perform(put("word")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(newWord)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.word").value(newWord.getWord()));
+    }
+
+    @Test
+    @SneakyThrows
+    public void givenValidDeleteRequest_thenDeleteTheWordFromDB(){
+
+        Word wordInDb = Word.builder().id(1L).word("Word").build();
+
+        given(wordRepository.findById(1L))
+                .willReturn(Optional.ofNullable(wordInDb));
+
+        mvc.perform(delete("word",1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
     }
 }
