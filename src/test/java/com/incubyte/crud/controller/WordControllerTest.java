@@ -1,9 +1,11 @@
 package com.incubyte.crud.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.incubyte.crud.model.Word;
 import com.incubyte.crud.repository.WordRepository;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -27,6 +29,10 @@ public class WordControllerTest {
     @Autowired
     private MockMvc mvc;
 
+    @InjectMocks
+    private ObjectMapper objectMapper;
+
+
     @Test
     @SneakyThrows
     public void givenValidGETRequest_thenReturnAllWordsInDB(){
@@ -49,9 +55,10 @@ public class WordControllerTest {
         given(wordRepository.save(Word.builder().word("Posting Word").build()))
                 .willReturn(Word.builder().id(1L).word("Posting Word").build());
 
-        mvc.perform(post("/word",Word.builder().word("Posting Word"))
+        mvc.perform(post("/word")
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Word.builder().word("Posting Word").build())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.word").value("Posting Word"));
 
