@@ -79,8 +79,10 @@ public class WordControllerTest {
 
         given(wordRepository.findById(1L))
                 .willReturn(Optional.ofNullable(wordInDb));
+        given(wordRepository.save(newWord))
+                .willReturn(newWord);
 
-        mvc.perform(put("word")
+        mvc.perform(put("/word")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(newWord)))
@@ -97,9 +99,12 @@ public class WordControllerTest {
         given(wordRepository.findById(1L))
                 .willReturn(Optional.ofNullable(wordInDb));
 
-        mvc.perform(delete("word",1L)
+
+
+        mvc.perform(delete("/word/{wordId}",1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").value("Success"))
                 .andExpect(status().isOk());
 
     }
