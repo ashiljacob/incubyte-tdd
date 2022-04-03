@@ -41,4 +41,19 @@ public class WordControllerTest {
                 .andExpect(jsonPath("$[0].word").value("Test"));
 
     }
+
+    @Test
+    @SneakyThrows
+    public void givenValidPOSTRequest_thenReturnOk(){
+
+        given(wordRepository.save(Word.builder().word("Posting Word").build()))
+                .willReturn(Word.builder().id(1L).word("Posting Word").build());
+
+        mvc.perform(post("/word",Word.builder().word("Posting Word"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.word").value("Posting Word"));
+
+    }
 }
