@@ -17,7 +17,7 @@ public class WordController {
 
     private final WordRepository wordRepository;
 
-    @GetMapping("/getAllWords")
+    @GetMapping("/words")
     public List<Word> getAllWords(){
         return  wordRepository.findAll();
     }

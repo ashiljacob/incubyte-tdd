@@ -13,8 +13,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -37,10 +37,12 @@ public class WordControllerTest {
     @SneakyThrows
     public void givenValidGETRequest_thenReturnAllWordsInDB(){
 
-        given(wordRepository.findAll())
-                .willReturn(Collections.singletonList(Word.builder().word("Test").build()));
+        List<Word> wordList = Collections.singletonList(Word.builder().word("Test").build());
 
-        mvc.perform(get("/getAllWords")
+        given(wordRepository.findAll())
+                .willReturn(wordList);
+
+        mvc.perform(get("/words")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -52,13 +54,16 @@ public class WordControllerTest {
     @SneakyThrows
     public void givenValidPOSTRequest_thenReturnOk(){
 
-        given(wordRepository.save(Word.builder().word("Posting Word").build()))
-                .willReturn(Word.builder().id(1L).word("Posting Word").build());
+        Word requestBody = Word.builder().word("Posting Word").build();
+        Word response = Word.builder().id(1L).word("Posting Word").build();
+
+        given(wordRepository.save(requestBody))
+                .willReturn(response);
 
         mvc.perform(post("/word")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Word.builder().word("Posting Word").build())))
+                .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.word").value("Posting Word"));
 
