@@ -7,10 +7,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -19,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest
 public class WordControllerTest {
 
-    @Mock
+    @MockBean
     private WordRepository wordRepository;
 
     @Autowired
@@ -29,13 +31,14 @@ public class WordControllerTest {
     @SneakyThrows
     public void givenValidGETRequest_thenReturnAllWordsInDB(){
 
-        given(wordRepository.findAll()).willReturn(Arrays.asList(Word.builder().word("Test").build()));
+        given(wordRepository.findAll())
+                .willReturn(Collections.singletonList(Word.builder().word("Test").build()));
 
-        mvc.perform(get("/getWords")
+        mvc.perform(get("/getAllWords")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.word").value("Test"));
+                .andExpect(jsonPath("$[0].word").value("Test"));
 
     }
 }
